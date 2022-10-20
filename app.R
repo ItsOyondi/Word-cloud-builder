@@ -40,7 +40,8 @@ ui <- fluidPage(
       mainPanel(
         
         #ouput contents displayed by the table
-        tableOutput("contents")
+        tableOutput("contents"),
+        plotOutput("distPlot")
         
       )
     )
@@ -49,41 +50,62 @@ ui <- fluidPage(
 # Define server logic
 server <- function(input, output) {
 
-  output$contents <- renderTable({
     
+    output$contents <- renderTable({
+      outs()
+      
+    })
+    output$distPlot <- renderPlot({
+      outs()
+    })
+    outs <- reactive({
       #check if file has contents
       if (is.null(input$file1)) {
         return(NULL)
       }
       # Read the text in the uploaded file
       text = readLines(input$file1$datapath)
-    
-     #start preprocessing
-    # Load all the data as a corpus
-    docs <- Corpus(VectorSource(text))
-    toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
-    docs <- tm_map(docs, toSpace, "/")
-    docs <- tm_map(docs, toSpace, "@")
-    docs <- tm_map(docs, toSpace, "\\|")
-    # Convert the text to lower case
-    docs <- tm_map(docs, content_transformer(tolower))
-    
-    # Remove english common stopwords
-    docs <- tm_map(docs, removeWords, stopwords("english"))
-    # Remove punctuations
-    docs <- tm_map(docs, removePunctuation)
-    # Eliminate extra white spaces
-    docs <- tm_map(docs, stripWhitespace)
-
-    dtm <- TermDocumentMatrix(docs)
-    m <- as.matrix(dtm)
-    v <- sort(rowSums(m),decreasing=TRUE)
-    df <- data.frame(word = names(v),freq=v) #create a data frame from the uploaded file.
-    
-    return(df) #return the df for words and frequencies
-    
-    
-  })
+      
+      #start preprocessing
+      # Load all the data as a corpus
+      docs <- Corpus(VectorSource(text))
+      toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+      docs <- tm_map(docs, toSpace, "/")
+      docs <- tm_map(docs, toSpace, "@")
+      docs <- tm_map(docs, toSpace, "\\|")
+      # Convert the text to lower case
+      docs <- tm_map(docs, content_transformer(tolower))
+      
+      # Remove english common stopwords
+      docs <- tm_map(docs, removeWords, stopwords("english"))
+      # Remove punctuations
+      docs <- tm_map(docs, removePunctuation)
+      # Eliminate extra white spaces
+      docs <- tm_map(docs, stripWhitespace)
+      
+      dtm <- TermDocumentMatrix(docs)
+      m <- as.matrix(dtm)
+      v <- sort(rowSums(m),decreasing=TRUE)
+      df <- data.frame(word = names(v),freq=v) #create a data frame from the uploaded file.
+     
+      #create a wordcloud from the data frame
+      #used withVisible function to avoid the coerce to df error
+      plot1 <- ggplot(df, aes(label = word, size=freq,
+                             color = factor(sample.int(10, nrow(df), replace = TRUE))
+                             
+      )) +
+        geom_text_wordcloud() +scale_size_area(max_size = 15) +
+        theme_minimal()
+      
+      if(input$radio == 1){
+        return(df) #return the data frame
+        
+      }else{
+        #plot the word cloud if word cloud is selected
+        return(plot1)
+      }
+    })
+ 
 }
 
 # Run the application 
