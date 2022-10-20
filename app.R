@@ -41,7 +41,7 @@ ui <- fluidPage(
         
         #ouput contents displayed by the table
         tableOutput("contents"),
-        plotOutput("distPlot")
+        plotOutput("wdPlot")
         
       )
     )
@@ -55,7 +55,7 @@ server <- function(input, output) {
       outs()
       
     })
-    output$distPlot <- renderPlot({
+    output$wdPlot <- renderPlot({
       outs()
     })
     outs <- reactive({
