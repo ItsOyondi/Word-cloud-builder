@@ -41,7 +41,8 @@ ui <- fluidPage(
         
         #ouput contents displayed by the table
         tableOutput("contents"),
-        plotOutput("wdPlot")
+        plotOutput("wdPlot"),
+        textOutput("rawtext")
         
       )
     )
@@ -49,8 +50,11 @@ ui <- fluidPage(
 
 # Define server logic
 server <- function(input, output) {
-
-    
+  
+    output$rawtext <- renderText({
+      readLines("tortoise and hare.txt")
+    })
+  
     output$contents <- renderTable({
       outs()
       
@@ -61,10 +65,12 @@ server <- function(input, output) {
     outs <- reactive({
       #check if file has contents
       if (is.null(input$file1)) {
-        return(NULL)
+        text = readLines("tortoise and hare.txt")
       }
+      else {
       # Read the text in the uploaded file
-      text = readLines(input$file1$datapath)
+        text = readLines(input$file1$datapath)
+      }
       
       #start preprocessing
       # Load all the data as a corpus
