@@ -8,6 +8,7 @@ library("wordcloud")
 library("RColorBrewer")
 library("ggwordcloud")
 library("ggplot2")
+source("helpers.R")
 # Define UI for application that draws a histogram
 ui <- fluidPage(
   
@@ -30,6 +31,7 @@ ui <- fluidPage(
       #separator
       hr(),
       
+      checkboxInput("showraw", label = "Show original text", value = TRUE),
       
       radioButtons("radio", label = h3("Available Options"),
                    choices = list("Table" = 1, "Word Cloud" = 2), 
@@ -40,10 +42,23 @@ ui <- fluidPage(
     #a section for displaying the table with words extracted from the uploaded file
     mainPanel(
       
-      #ouput contents displayed by the table
-      tableOutput("contents"),
-      plotOutput("wdPlot"),
-      textOutput("rawtext")
+      conditionalPanel(
+        "input.showraw == true", 
+        wellPanel(
+          textOutput("rawtext")
+        )
+      ),
+      
+      #output contents displayed by the table
+      conditionalPanel(
+        "input.radio == 1", 
+        tableOutput("table")
+      ), 
+      conditionalPanel(
+        "input.radio == 2", 
+        plotOutput("wdPlot")
+      ),
+      
       
     )
   )
@@ -51,65 +66,30 @@ ui <- fluidPage(
 
 # Define server logic
 server <- function(input, output) {
-  d_story <- readLines("tortoise and hare.txt") #I don't see d_story used anywhere
+  d_story <- readLines("tortoise and hare.txt")
   
-  
-  output$contents <- renderTable({
-    outs()
-    
-  })
-  output$wdPlot <- renderPlot({
-    outs()
-  })
-  outs <- reactive({
+  freq_dat <- reactive({
     #check if file has contents
     if (is.null(input$file1)) {
-      text = readLines("tortoise and hare.txt")
+      df <- word_freq("tortoise and hare.txt")
     }
     else {
       # Read the text in the uploaded file
-      text = readLines(input$file1$datapath)
+      df <- word_freq(input$file1$datapath)
     }
-    
-    #start preprocessing
-    # Load all the data as a corpus
-    docs <- Corpus(VectorSource(text))
-    toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
-    docs <- tm_map(docs, toSpace, "/")
-    docs <- tm_map(docs, toSpace, "@")
-    docs <- tm_map(docs, toSpace, "\\|")
-    # Convert the text to lower case
-    docs <- tm_map(docs, content_transformer(tolower))
-    
-    # Remove english common stopwords
-    docs <- tm_map(docs, removeWords, stopwords("english"))
-    # Remove punctuations
-    docs <- tm_map(docs, removePunctuation)
-    # Eliminate extra white spaces
-    docs <- tm_map(docs, stripWhitespace)
-    
-    dtm <- TermDocumentMatrix(docs)
-    m <- as.matrix(dtm)
-    v <- sort(rowSums(m),decreasing=TRUE)
-    df <- data.frame(word = names(v),freq=v) #create a data frame from the uploaded file.
-    
-    #create a wordcloud from the data frame
-    #used withVisible function to avoid the coerce to df error
-    plot1 <- ggplot(df, size=1.6, shape = 'diamond', aes(label = word, size=freq,
-                            color = factor(sample.int(10, nrow(df), replace = TRUE))
-                            
+    df
+  })
+  
+  output$table <- renderTable({
+    freq_dat()
+  })
+  
+  output$wdPlot <- renderPlot({
+    ggplot(freq_dat(), size=1.6, shape = 'diamond', aes(label = word, size=freq,
+                                                color = factor(sample.int(10, nrow(df), replace = TRUE))
     )) +
       geom_text_wordcloud() +scale_size_area(max_size = 16) +
       theme_minimal()
-    
-    #display datafrma and the word clouds depending on user selection
-    if(input$radio == 1){
-      return(df) #return the data frame
-      
-    }else{
-      #plot the word cloud if word cloud is selected
-      return(plot1)
-    }
   })
   
   #section for displaying the story in textual format
@@ -119,7 +99,7 @@ server <- function(input, output) {
       return(d_story) #default story
       
     }else{
-      return(text) #display text from uploaded file
+      return(input$file1$datapath) #display text from uploaded file
     }
   })
   
