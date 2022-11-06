@@ -101,16 +101,7 @@ server <- function(input, output) {
     )) +
       geom_text_wordcloud() +scale_size_area(max_size = 16) +
       theme_minimal()
-    #section for displaying the story in textual format
-    output$rawtext <- renderText({
-      
-      if(is.null(input$file1)){
-        return(d_story) #default story
-        
-      }else{
-        return(text) #display text from uploaded file
-      }
-    })
+    
     #display datafrma and the word clouds depending on user selection
     if(input$radio == 1){
       return(df) #return the data frame
@@ -118,6 +109,17 @@ server <- function(input, output) {
     }else{
       #plot the word cloud if word cloud is selected
       return(plot1)
+    }
+  })
+  
+  #section for displaying the story in textual format
+  output$rawtext <- renderText({
+    
+    if(is.null(input$file1)){
+      return(d_story) #default story
+      
+    }else{
+      return(text) #display text from uploaded file
     }
   })
   
