@@ -51,7 +51,7 @@ ui <- fluidPage(
 
 # Define server logic
 server <- function(input, output) {
-  d_story <- readLines("tortoise and hare.txt")
+  d_story <- readLines("tortoise and hare.txt") #I don't see d_story used anywhere
   
   
   output$contents <- renderTable({
