@@ -4,5 +4,12 @@ This project focuses on implementing an R Shiny app for creating word clouds fro
 
 Test that I can make changes. (from Dr. A)
 
+Future ideas:
+* More default stories and select between them
+* Bar graph showing frequencies
+* Less overlap between words
+* Word clouds for text ratings with 1-5 scale
+* Search for individual word(s) in Word Cloud -> show frequency or only color that word
+
 
 ## Published here: [Automatic Word Cloud Builder](https://itsoyondi.shinyapps.io/wbuilder/)
