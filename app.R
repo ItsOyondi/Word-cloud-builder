@@ -86,7 +86,7 @@ server <- function(input, output) {
   
   output$wdPlot <- renderPlot({
     ggplot(freq_dat(), size=1.6, shape = 'diamond', aes(label = word, size=freq,
-                                                color = factor(sample.int(10, nrow(df), replace = TRUE))
+                                                color = factor(sample.int(10, nrow(freq_dat()), replace = TRUE))
     )) +
       geom_text_wordcloud() +scale_size_area(max_size = 16) +
       theme_minimal()
