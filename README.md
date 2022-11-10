@@ -13,6 +13,7 @@ Future ideas:
 * More user control when processing text data 
     * if they want stop words included
     * if they want certain words left out
+    * shape of word cloud
 
 
 ## Published here: [Automatic Word Cloud Builder](https://itsoyondi.shinyapps.io/wbuilder/)
