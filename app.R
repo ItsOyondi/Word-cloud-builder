@@ -64,6 +64,7 @@ ui <- fluidPage(
                   hr(),
                   
                   checkboxInput("showraw", label = "Show original text", value = TRUE),
+                  checkboxInput("with_stopwords", label = "Include stop words?", value = TRUE),
                   hr(),
                   
                   radioButtons(
@@ -139,21 +140,21 @@ server <- function(input, output) {
       
       #check the default story selected
       if(input$stories == "Hare and Tortoise"){
-        df <- word_freq("tortoise and hare.txt")
+        df <- word_freq("tortoise and hare.txt", input$with_stopwords)
       }else if(input$stories == "Computer History"){
-        df <- word_freq("computer history.txt")
+        df <- word_freq("computer history.txt", input$with_stopwords)
       }else if(input$stories == "Comic Con"){
-        df <- word_freq("comicon.txt")
+        df <- word_freq("comicon.txt", input$with_stopwords)
       }else if(input$stories == "Netflix"){
-        df <- word_freq("netflix.txt")
+        df <- word_freq("netflix.txt", input$with_stopwords)
       }else if(input$stories == "Bitcoin"){
-        df <- word_freq("Bitcoin.txt")
+        df <- word_freq("Bitcoin.txt", input$with_stopwords)
       }
       
     }
     else {
       # Read the text in the uploaded file
-      df <- word_freq(input$file1$datapath)
+      df <- word_freq(input$file1$datapath, input$with_stopwords)
     }
     df
   })
