@@ -1,4 +1,4 @@
-word_freq <- function(textfile){
+word_freq <- function(textfile, stp_val){
   text <- readLines(textfile) #text is a vector with one element for each line of the input file.
   text <- str_c(text, collapse = " ") #text is now a single element
   docs <- VCorpus(VectorSource(text)) #tm library
@@ -11,8 +11,12 @@ word_freq <- function(textfile){
   # Convert the text to lower case
   docs <- tm_map(docs, content_transformer(tolower))
   
-  # Remove english common stopwords
-  docs <- tm_map(docs, removeWords, stopwords("english"))
+  #check if user has selected include stopwords or not
+  if(stp_val == FALSE){ 
+    # Remove english common stopwords
+    docs <- tm_map(docs, removeWords, stopwords("english"))
+  }
+  
   # Remove punctuations
   docs <- tm_map(docs, removePunctuation)
   # Eliminate extra white spaces
