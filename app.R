@@ -1,4 +1,3 @@
-
 #word cloud builder project
 library(shiny)
 library("tm")
@@ -43,7 +42,7 @@ ui <- fluidPage(
     ),
      tabPanel("Preprocessing",
               # Application title
-              titlePanel(h1("Word Cloud Builder App", align = "center", style = "font-family: 'Century Gothic', serif;
+              titlePanel(h1("Text Analysis App", align = "center", style = "font-family: 'Century Gothic', serif;
     font-weight: 500; font-size: 50px; text-shadow: 3px 3px 3px #aaa; line-height: 1; 
      color: #404040;")),
               
@@ -67,6 +66,9 @@ ui <- fluidPage(
                   checkboxInput("with_stopwords", label = "Include stop words?", value = TRUE),
                   hr(),
                   
+                  textInput("excludes", "Text To Exclude (NB: no spaces between each word)", "e.g. word1,word2,word3"),
+                  hr(),
+                  
                   radioButtons(
                     "stories", "Default Stories: ",
                     c("Hare and Tortoise", "Computer History", "Comic Con","Netflix", "Bitcoin"),
@@ -83,6 +85,7 @@ ui <- fluidPage(
                     selected = "diamond",
                     inline = TRUE
                   ),
+                  
                   hr(),
                   radioButtons("radio", label = h3("Available Options"),
                                choices = list("Table" = 1, "Word Cloud" = 2), 
@@ -134,21 +137,26 @@ server <- function(input, output) {
   d_story3 <- readLines("comicon.txt")
   d_story4 <- readLines("Bitcoin.txt")
   
+  
   freq_dat <- reactive({
+    #get all the excluded words
+    wd_excluded <- unlist(strsplit(input$excludes, ",")
+    )
+    print(wd_excluded)
     #check if file has contents
     if (is.null(input$file1)) {
       
       #check the default story selected
       if(input$stories == "Hare and Tortoise"){
-        df <- word_freq("tortoise and hare.txt", input$with_stopwords)
+        df <- word_freq("tortoise and hare.txt", input$with_stopwords, wd_excluded)
       }else if(input$stories == "Computer History"){
-        df <- word_freq("computer history.txt", input$with_stopwords)
+        df <- word_freq("computer history.txt", input$with_stopwords, wd_excluded)
       }else if(input$stories == "Comic Con"){
-        df <- word_freq("comicon.txt", input$with_stopwords)
+        df <- word_freq("comicon.txt", input$with_stopwords, wd_excluded)
       }else if(input$stories == "Netflix"){
-        df <- word_freq("netflix.txt", input$with_stopwords)
+        df <- word_freq("netflix.txt", input$with_stopwords, wd_excluded)
       }else if(input$stories == "Bitcoin"){
-        df <- word_freq("Bitcoin.txt", input$with_stopwords)
+        df <- word_freq("Bitcoin.txt", input$with_stopwords, wd_excluded)
       }
       
     }
