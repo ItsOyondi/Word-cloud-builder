@@ -31,3 +31,12 @@ word_freq <- function(textfile, stp_val, excludes=NULL){
   df <- data.frame(word = names(v),freq=v) #create a data frame from the uploaded file.
   as_tibble(df)
 }
+
+get_word_in_cloud <- function(cloud_file){
+  #getting the words using Tesseract OCR engine
+  eng <- tesseract("eng") #get engine
+  
+  extracted_txt <- tesseract::ocr_data(cloud_file, engine = eng)
+  extracted_txt
+  
+}
