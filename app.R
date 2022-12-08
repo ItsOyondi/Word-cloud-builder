@@ -8,7 +8,10 @@ library("RColorBrewer")
 library("ggwordcloud")
 library("ggplot2")
 library(fresh)
+library(tesseract)
+library(qpdf)
 source("helpers.R")
+
 
 set.seed(12500)
 
@@ -85,7 +88,8 @@ ui <- fluidPage(
                     selected = "diamond",
                     inline = TRUE
                   ),
-                  
+                  hr(),
+                  textInput("keywords", "Enter word to search in the word cloud"),
                   hr(),
                   radioButtons("radio", label = h3("Available Options"),
                                choices = list("Table" = 1, "Word Cloud" = 2), 
@@ -113,6 +117,10 @@ ui <- fluidPage(
                   conditionalPanel(
                     "input.radio == 2", 
                     plotOutput("wdPlot")
+                  ),
+                  wellPanel(
+                    h4("Words read from the word cloud"),
+                    shiny::dataTableOutput("txt_from_viz")
                   ),
                   
                   
@@ -214,6 +222,7 @@ server <- function(input, output) {
         )) +
           geom_text_wordcloud_area(shape = shape) +scale_size_area(max_size = 16) +
           theme_minimal())
+        
       }else if(input$shapes == "pentagon"){
         shape = "pentagon"
         print(ggplot(freq_dat(), size=1.6, shape = shape, aes(label = word, size=freq,
@@ -221,11 +230,16 @@ server <- function(input, output) {
         )) +
           geom_text_wordcloud_area(shape = shape) +scale_size_area(max_size = 16) +
           theme_minimal())
+        
       }
       
+      
+      
     }
+    ggsave("viz.png") #save image
     
   })
+
     
     #data table
     output$table <- shiny::renderDataTable({
@@ -252,6 +266,12 @@ server <- function(input, output) {
       }else{
         return(readLines(input$file1$datapath)) #display text from uploaded file
       }
+    })
+    
+    #show text read from visualization
+    output$txt_from_viz <- shiny::renderDataTable({ 
+      txt = get_word_in_cloud("viz.png")
+      return(txt)
     })
   
   
