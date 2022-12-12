@@ -92,8 +92,12 @@ ui <- fluidPage(
                   textInput("keywords", "Enter word to search in the word cloud"),
                   hr(),
                   radioButtons("radio", label = h3("Available Options"),
-                               choices = list("Table" = 1, "Word Cloud" = 2), 
+                               choices = list("Table" = 1, "Word Cloud" = 2, 
+                                              "Bar Chart" = 3), 
                                selected = 1),
+                  hr(),
+                  checkboxInput("top_words", label = "Bar chart: Top 10 most used words", value = FALSE),
+                  checkboxInput("btm_words", label = "Bar chart: Least used words", value = FALSE),
                   
                   
                 ),
@@ -118,10 +122,14 @@ ui <- fluidPage(
                     "input.radio == 2", 
                     plotOutput("wdPlot")
                   ),
-                  wellPanel(
-                    h4("Words read from the word cloud"),
-                    shiny::dataTableOutput("txt_from_viz")
+                  conditionalPanel(
+                    "input.radio == 3", 
+                    plotOutput("bchart")
                   ),
+                  #wellPanel(
+                    #h4("Words read from the word cloud"),
+                    #shiny::dataTableOutput("txt_from_viz")
+                #  ),
                   
                   
                 )
@@ -139,11 +147,11 @@ ui <- fluidPage(
 
 # Define server logic
 server <- function(input, output) {
-  d_story <- readLines("tortoise and hare.txt")
-  d_story1 <- readLines("netflix.txt")
-  d_story2 <- readLines("computer history.txt")
-  d_story3 <- readLines("comicon.txt")
-  d_story4 <- readLines("Bitcoin.txt")
+  d_story <- readLines("tortoise and hare.txt",warn=FALSE)
+  d_story1 <- readLines("netflix.txt", warn=FALSE)
+  d_story2 <- readLines("computer history.txt", warn=FALSE)
+  d_story3 <- readLines("comicon.txt", warn=FALSE)
+  d_story4 <- readLines("Bitcoin.txt", warn=FALSE)
   
   
   freq_dat <- reactive({
@@ -172,7 +180,7 @@ server <- function(input, output) {
       # Read the text in the uploaded file
       df <- word_freq(input$file1$datapath, input$with_stopwords)
     }
-    df
+    return(df)
   })
   
   output$contents <- shiny::renderDataTable({
@@ -180,6 +188,8 @@ server <- function(input, output) {
   })
   
   output$wdPlot <- renderPlot({
+    
+    
     for (shape in c(
       "circle", "cardioid", "diamond",
       "square", "triangle-upright",
@@ -236,10 +246,40 @@ server <- function(input, output) {
       
       
     }
-    ggsave("viz.png") #save image
+    
     
   })
-
+  
+    #get input value from customer
+    dt <- freq_dat()
+    sum(str_detect(dt$word, input$keywords))
+    
+    output$bchart <- renderPlot({
+      #words adjusted at angle 45 degrees
+      #the chart shows top words first
+      #guides fill=false, no need for highlighting the word and colors, user can see top words first.
+      #create a data frame with sliced dataset
+      dt <- freq_dat()
+      #check if user wonts top or lest used words
+      if(input$top_words == TRUE){
+        df_t <- dt[c(1:10), c("word", "freq")] #select the first 10 words with highest frequency
+        ggplot(df_t, aes(x=reorder(word, -freq), y=freq, fill=word)) + geom_bar(stat="identity")+
+          guides(fill=FALSE) + theme(axis.text.x=element_text(angle=45, hjust=0.9))+ theme_classic() 
+      }
+      #check if user wonts the least used rrds
+      else if(input$btm_words == TRUE){
+        df_t <- tail(dt, n=10) #select the firsr 10 words with highest frequency
+        ggplot(df_t, aes(x=reorder(word, -freq), y=freq, fill=word)) + geom_bar(stat="identity")+
+          guides(fill=FALSE) + theme(axis.text.x=element_text(angle=45, hjust=0.9))+ theme_classic() 
+      }else{
+        #plot chart with all words if user not specified
+        ggplot(dt, aes(x=reorder(word, -freq), y=freq, fill=word)) + geom_bar(stat="identity")+
+          guides(fill=FALSE) + theme(axis.text.x=element_text(angle=45, hjust=0.9))+ theme_classic() 
+      }
+     
+    })
+    
+    
     
     #data table
     output$table <- shiny::renderDataTable({
@@ -268,11 +308,12 @@ server <- function(input, output) {
       }
     })
     
+    
     #show text read from visualization
-    output$txt_from_viz <- shiny::renderDataTable({ 
-      txt = get_word_in_cloud("viz.png")
-      return(txt)
-    })
+    #output$txt_from_viz <- shiny::renderDataTable({ 
+     # txt = get_word_in_cloud("viz.png")
+     # return(txt)
+   # })
   
   
   
