@@ -90,6 +90,8 @@ ui <- fluidPage(
                   ),
                   hr(),
                   textInput("keywords", "Enter word to search in the word cloud"),
+                  submitButton("Search", icon("refresh")),
+                  verbatimTextOutput("value"),
                   hr(),
                   radioButtons("radio", label = h3("Available Options"),
                                choices = list("Table" = 1, "Word Cloud" = 2, 
@@ -183,12 +185,28 @@ server <- function(input, output) {
     return(df)
   })
   
+  
+  
   output$contents <- shiny::renderDataTable({
     freq_dat()
   })
   
-  output$wdPlot <- renderPlot({
+  output$value <- renderPrint({ 
     
+    #check if input word exists in the data frame
+    dt <- freq_dat()
+    
+    if(input$keywords %in% dt$word){
+      #get the freq value
+       val <- dt[!input$keywords %in% dt$word, ]
+       return(val)
+    }else{
+      return("Word not found")
+    }
+    
+  })
+  
+  output$wdPlot <- renderPlot({
     
     for (shape in c(
       "circle", "cardioid", "diamond",
@@ -250,9 +268,7 @@ server <- function(input, output) {
     
   })
   
-    #get input value from customer
-    dt <- freq_dat()
-    sum(str_detect(dt$word, input$keywords))
+    
     
     output$bchart <- renderPlot({
       #words adjusted at angle 45 degrees
