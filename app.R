@@ -90,7 +90,7 @@ ui <- fluidPage(
                   ),
                   hr(),
                   textInput("keywords", "Enter word to search in the word cloud"),
-                  submitButton("Search", icon("refresh")),
+                  #submitButton("Search", icon("refresh")),
                   verbatimTextOutput("value"),
                   hr(),
                   radioButtons("radio", label = h3("Available Options"),
@@ -198,8 +198,8 @@ server <- function(input, output) {
     
     if(input$keywords %in% dt$word){
       #get the freq value
-       val <- dt[!input$keywords %in% dt$word, ]
-       return(val)
+      val <- dt[!input$keywords %in% dt$word, ]
+      return(val)
     }else{
       return("Word not found")
     }
