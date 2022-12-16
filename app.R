@@ -68,7 +68,7 @@ ui <- fluidPage(
                   checkboxInput("with_stopwords", label = "Include stop words?", value = TRUE),
                   hr(),
                   
-                  textInput("excludes", "Text To Exclude (NB: no spaces between each word)", "e.g. word1,word2,word3"),
+                  textInput("excludes", "Text To Exclude (NB: no spaces between each word)", placeholder = "e.g. word1,word2,word3"),
                   hr(),
                   
                   radioButtons(
