@@ -198,7 +198,7 @@ server <- function(input, output) {
     
     if(input$keywords %in% dt$word){
       #get the freq value
-      val <- dt[!input$keywords %in% dt$word, ]
+      val <- dt[input$keywords == dt$word, ]$freq
       return(val)
     }else{
       return("Word not found")
