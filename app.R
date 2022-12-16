@@ -66,6 +66,7 @@ ui <- fluidPage(
                   
                   checkboxInput("showraw", label = "Show original text", value = TRUE),
                   checkboxInput("with_stopwords", label = "Include stop words?", value = TRUE),
+                  numericInput("max_size", label = "Maximum Font Size (controls word cloud size)", value = 20, min = 1, step = 1),
                   hr(),
                   
                   textInput("excludes", "Text To Exclude (NB: no spaces between each word)", placeholder = "e.g. word1,word2,word3"),
@@ -212,7 +213,7 @@ server <- function(input, output) {
         print(ggplot(freq_dat(), size=1.6, aes(label = word, size=freq,
                                                                color = factor(sample.int(10, nrow(freq_dat()), replace = TRUE))
         )) +
-          geom_text_wordcloud_area(shape = input$shapes) +scale_size_area(max_size = 16) +
+          geom_text_wordcloud_area(shape = input$shapes) +scale_size_area(max_size = input$max_size) +
           theme_minimal()
         )
     
