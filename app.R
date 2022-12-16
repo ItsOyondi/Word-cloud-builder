@@ -207,63 +207,14 @@ server <- function(input, output) {
   
   output$wdPlot <- renderPlot({
     
-    for (shape in c(
-      "circle", "cardioid", "diamond",
-      "square", "triangle-upright",
-      "pentagon"
-    )) {
       set.seed(100)
       
-      if(input$shapes == "circle"){
-        shape = "circle"
-        print(ggplot(freq_dat(), size=1.6, shape = shape, aes(label = word, size=freq,
+        print(ggplot(freq_dat(), size=1.6, aes(label = word, size=freq,
                                                                color = factor(sample.int(10, nrow(freq_dat()), replace = TRUE))
         )) +
-          geom_text_wordcloud_area(shape = shape) +scale_size_area(max_size = 16) +
-          theme_minimal())
-      }else if(input$shapes == "cardioid"){
-        shape = "cardioid"
-        print(ggplot(freq_dat(), size=1.6, shape = shape, aes(label = word, size=freq,
-                                                              color = factor(sample.int(10, nrow(freq_dat()), replace = TRUE))
-        )) +
-          geom_text_wordcloud_area(shape = shape) +scale_size_area(max_size = 16) +
-          theme_minimal())
-      }else if(input$shapes == "diamond"){
-        shape = "diamond"
-        print(ggplot(freq_dat(), size=1.6, shape = shape, aes(label = word, size=freq,
-                                                              color = factor(sample.int(10, nrow(freq_dat()), replace = TRUE))
-        )) +
-          geom_text_wordcloud_area(shape = shape) +scale_size_area(max_size = 16) +
-          theme_minimal())
-      }else if(input$shapes == "square"){
-        shape = "square"
-        print(ggplot(freq_dat(), size=1.6, shape = shape, aes(label = word, size=freq,
-                                                              color = factor(sample.int(10, nrow(freq_dat()), replace = TRUE))
-        )) +
-          geom_text_wordcloud_area(shape = shape) +scale_size_area(max_size = 16) +
-          theme_minimal())
-      }else if(input$shapes == "triangle-upright"){
-        shape = "triangle-upright"
-        print(ggplot(freq_dat(), size=1.6, shape = shape, aes(label = word, size=freq,
-                                                              color = factor(sample.int(10, nrow(freq_dat()), replace = TRUE))
-        )) +
-          geom_text_wordcloud_area(shape = shape) +scale_size_area(max_size = 16) +
-          theme_minimal())
-        
-      }else if(input$shapes == "pentagon"){
-        shape = "pentagon"
-        print(ggplot(freq_dat(), size=1.6, shape = shape, aes(label = word, size=freq,
-                                                              color = factor(sample.int(10, nrow(freq_dat()), replace = TRUE))
-        )) +
-          geom_text_wordcloud_area(shape = shape) +scale_size_area(max_size = 16) +
-          theme_minimal())
-        
-      }
-      
-      
-      
-    }
-    
+          geom_text_wordcloud_area(shape = input$shapes) +scale_size_area(max_size = 16) +
+          theme_minimal()
+        )
     
   })
   
