@@ -8,7 +8,6 @@ library("RColorBrewer")
 library("ggwordcloud")
 library("ggplot2")
 library(fresh)
-library(tesseract)
 library(qpdf)
 source("helpers.R")
 
