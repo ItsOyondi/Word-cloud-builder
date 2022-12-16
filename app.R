@@ -98,7 +98,7 @@ ui <- fluidPage(
                                               "Bar Chart" = 3), 
                                selected = 1),
                   hr(),
-                  checkboxInput("top_words", label = "Bar chart: Top 10 most used words", value = FALSE),
+                  checkboxInput("top_words", label = "Bar chart: Top 10 most used words", value = TRUE),
                   checkboxInput("btm_words", label = "Bar chart: Least used words", value = FALSE),
                   
                   
@@ -230,20 +230,18 @@ server <- function(input, output) {
       #check if user wonts top or lest used words
       if(input$top_words == TRUE){
         df_t <- dt[c(1:10), c("word", "freq")] #select the first 10 words with highest frequency
-        ggplot(df_t, aes(x=reorder(word, -freq), y=freq, fill=word)) + geom_bar(stat="identity")+
-          guides(fill=FALSE) + theme(axis.text.x=element_text(angle=45, hjust=0.9))+ theme_classic() 
       }
       #check if user wonts the least used rrds
       else if(input$btm_words == TRUE){
         df_t <- tail(dt, n=10) #select the firsr 10 words with highest frequency
-        ggplot(df_t, aes(x=reorder(word, -freq), y=freq, fill=word)) + geom_bar(stat="identity")+
-          guides(fill=FALSE) + theme(axis.text.x=element_text(angle=45, hjust=0.9))+ theme_classic() 
       }else{
         #plot chart with all words if user not specified
-        ggplot(dt, aes(x=reorder(word, -freq), y=freq, fill=word)) + geom_bar(stat="identity")+
-          guides(fill=FALSE) + theme(axis.text.x=element_text(angle=45, hjust=0.9))+ theme_classic() 
+       df_t <- dt
       }
-     
+      ggplot(df_t, aes(y=reorder(word, freq), x=freq)) + geom_bar(stat="identity")+
+        xlab("Frequency") + 
+        ylab("Word") + 
+        theme(axis.text.y=element_text(size = 14))
     })
     
     
